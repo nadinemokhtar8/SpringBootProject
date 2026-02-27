@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="utf-8">
+<title>Book List</title>
+<link rel="stylesheet" type="text/css"
+      href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+</head>
+<body>
+	<div th:replace="template"></div>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            Book List
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Book Name</th>
+                        <th>Price</th>
+                        <th>Creation Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${books.content}">
+                        <td th:text="${p.idBook}"></td>
+                        <td th:text="${p.bookName}"></td>
+                        <td th:text="${p.bookPrice}"></td>
+                        <td th:text="${#dates.format(p.dateCreation, 'dd/MM/yyyy')}"></td>
+						<td th:text="${p.bookPrice}"></td> 
+						<td><a class="btn btn-danger" onclick="return confirm('Etes-vous sûr ?')"  th:href="@{supprimerProduit(id=${p.idBook}, 
+						page=${currentPage},size=${size})}">Supprimer</a></td>
+                    </tr>
+                </tbody>
+            </table>
+			<ul class="nav nav-pills">
+			 <li th:each="page,status:${pages}">
+			 <a th:class="${status.index==currentPage?'btn btn-primary':'btn' }"
+			 th:href="@{ BookList(page=${status.index}, size=${size} ) }"
+			 th:text="${status.index }"></a>
+			 </li>
+			 </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>
