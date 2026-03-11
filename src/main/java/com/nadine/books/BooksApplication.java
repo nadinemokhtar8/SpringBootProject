@@ -21,9 +21,9 @@ public class BooksApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		bookService.saveProduit(new Book("Insatiable",10.10,new Date()));
+		/*bookService.saveProduit(new Book("Insatiable",10.10,new Date()));
 		bookService.saveProduit(new Book("Voracious",15.10,new Date()));
-		bookService.saveProduit(new Book("Grovel",12.10,new Date()));
+		bookService.saveProduit(new Book("Grovel",12.10,new Date()));*/
 
 
 		

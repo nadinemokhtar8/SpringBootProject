@@ -1,20 +1,22 @@
 package com.nadine.books.controller;
 
 import java.text.ParseException;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import com.nadine.books.genres.Book;
+import com.nadine.books.genres.Genre;
 import com.nadine.books.service.BookService;
+
+import jakarta.validation.Valid;
 
 @Controller
 public class BookController {
@@ -36,23 +38,44 @@ public class BookController {
 	}
 
 	@GetMapping("/showCreate")
-	public String showCreate() {
-		return "createProduit";
+	public String showCreate(ModelMap modelMap) {
+		modelMap.addAttribute("book", new Book());
+		List<Genre> genres = bookService.getAllGenres();
+		modelMap.addAttribute("mode", "new");
+		modelMap.addAttribute("genres", genres);
+		return "formBook";
 	}
 
-	@GetMapping("/saveProduit")
-	public String saveProduit(@ModelAttribute("books") Book book, @RequestParam("date") String date,
-			ModelMap modelMap) throws ParseException {
-//conversion de la date
-		SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
-		Date dateCreation = dateformat.parse(String.valueOf(date));
-		book.setDateCreation(dateCreation);
+	@PostMapping("/saveProduit")
+	public String saveProduit(@Valid @ModelAttribute("book") Book book,
+	                          BindingResult bindingResult,
+	                          @RequestParam(name="page", defaultValue="0") int page,
+	                          @RequestParam(name="size", defaultValue="2") int size,
+	                          ModelMap modelMap) {
+	    int currentPage;
+	    boolean isNew = false;
 
-		Book saveProduit = bookService.saveProduit(book);
-		String msg = "produit enregistré avec Id " + saveProduit.getIdBook();
-		modelMap.addAttribute("msg", msg);
-		return "createProduit";
+	    // Si erreurs de validation, on reste sur le formulaire
+	    if (bindingResult.hasErrors()) {
+	        return "formBook";
+	    }
+
+	    if (book.getIdBook() == null) {
+	        isNew = true;
+	    }
+
+	    bookService.saveProduit(book);
+
+	    if (isNew) {
+	        Page<Book> books = bookService.getAllProduitsParPage(page, size);
+	        currentPage = books.getTotalPages() - 1; 
+	    } else {
+	        currentPage = page;
+	    }
+	    return "redirect:/BookList?page=" + currentPage + "&size=" + size;
 	}
+
+
 	@RequestMapping("/supprimerProduit")
 	public String supprimerProduit(@RequestParam("id") Long id,
 	ModelMap modelMap,
@@ -68,16 +91,14 @@ public class BookController {
 			modelMap.addAttribute("size", size);
 			return "BookList";
 			}
-	@RequestMapping("/modifierProduit")
-	public String editerProduit(@RequestParam("id") Long id, ModelMap modelMap,
-			@RequestParam (name="page",defaultValue = "0") int page,
-			@RequestParam (name="size", defaultValue = "2") int size) {
-		Book p = bookService.getProduit(id);
-		modelMap.addAttribute("mode", "edit");
-		modelMap.addAttribute("produit", p);
-		modelMap.addAttribute("page", page);
-		modelMap.addAttribute("size", size);
-		
-		return "formProduit";
+	@RequestMapping("/modifierLivre")
+	public String editerProduit(@RequestParam("id") Long id,ModelMap modelMap)
+	{
+	Book p= bookService.getProduit(id);
+	List<Genre> genres = bookService.getAllGenres();
+	modelMap.addAttribute("book", p);
+	modelMap.addAttribute("mode", "edit");
+	modelMap.addAttribute("genres", genres);
+	return "formBook";
 	}
 }
