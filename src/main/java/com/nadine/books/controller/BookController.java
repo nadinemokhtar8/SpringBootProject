@@ -22,6 +22,13 @@ import jakarta.validation.Valid;
 public class BookController {
 	@Autowired
 	BookService bookService;
+	@Controller
+	public class SecurityController {
+	@GetMapping("/accessDenied")
+	public String error()
+	{
+	return "accessDenied";
+	}
 
 	@GetMapping("/BookList")
 	public String BookList(ModelMap modelMap,
@@ -54,8 +61,6 @@ public class BookController {
 	                          ModelMap modelMap) {
 	    int currentPage;
 	    boolean isNew = false;
-
-	    // Si erreurs de validation, on reste sur le formulaire
 	    if (bindingResult.hasErrors()) {
 	        return "formBook";
 	    }
@@ -92,13 +97,19 @@ public class BookController {
 			return "BookList";
 			}
 	@RequestMapping("/modifierLivre")
-	public String editerProduit(@RequestParam("id") Long id,ModelMap modelMap)
+	public String editerProduit(@RequestParam("id") Long id,
+			ModelMap modelMap,
+			@RequestParam (name="page",defaultValue = "0") int page,
+			@RequestParam (name="size", defaultValue = "3") int size)
 	{
 	Book p= bookService.getProduit(id);
 	List<Genre> genres = bookService.getAllGenres();
 	modelMap.addAttribute("book", p);
 	modelMap.addAttribute("mode", "edit");
+	modelMap.addAttribute("currentPage", page);  // 
+    modelMap.addAttribute("size", size);
 	modelMap.addAttribute("genres", genres);
 	return "formBook";
 	}
-}
+	
+}}
