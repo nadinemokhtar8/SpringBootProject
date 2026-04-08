@@ -1,5 +1,7 @@
 package com.nadine.books.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,9 +35,13 @@ public class UserServiceImpl implements UserService {
 	    if (usr == null) {
 	        throw new RuntimeException("User not found: " + username);
 	    }
-	    Role role = roleRep.findByRole(roleName);
-	    if (role == null) {
+	    List<Role> roles = roleRep.findByRole(roleName);
+	    if (roles.isEmpty()) {
 	        throw new RuntimeException("Role not found: " + roleName);
+	    }
+	    Role role = roles.get(0);
+	    if (usr.getRoles().stream().anyMatch(existingRole -> existingRole.getRole().equals(roleName))) {
+	    	return;
 	    }
 	    usr.getRoles().add(role);
 	    userRep.save(usr);
@@ -54,6 +60,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Role addRole(Role role) {
 		return roleRep.save(role);
+	}
+
+	@Override
+	public List<Role> findRolesByName(String roleName) {
+		return roleRep.findByRole(roleName);
 	}
 
 	@Override

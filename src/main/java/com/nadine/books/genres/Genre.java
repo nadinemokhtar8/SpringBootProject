@@ -2,6 +2,7 @@ package com.nadine.books.genres;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,9 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class Genre {
@@ -22,6 +21,7 @@ public class Genre {
 	private String NameG;
 	private String descriptionG;
 	@OneToMany (mappedBy="genre")
+	@JsonIgnore
 	private List<Book>books;
 	
 	

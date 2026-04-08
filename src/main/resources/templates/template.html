@@ -14,46 +14,45 @@
 
 <body>
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-    <!-- Brand -->
-    <a class="navbar-brand" href="#">Books Managing</a>
+    <a class="navbar-brand" th:href="@{/BookList}">Books Managing</a>
 
-    <!-- Links -->
     <ul class="navbar-nav">
         <li class="nav-item">
             <a class="nav-link" th:href="@{/BookList}">Home</a>
         </li>
-        <!-- Dropdown -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                 Books
             </a>
             <div class="dropdown-menu">
-				<a sec:authorize="hasAnyAuthority('ADMIN', 'AGENT')"
-				   class="dropdown-item"
-				   th:href="@{/showCreate}">
-				    Add
-				</a>
-                <a class="dropdown-item" th:href="@{/BookList}">List</a>
+                <a class="dropdown-item" th:href="@{/BookList}">Browse list</a>
+                <a sec:authorize="hasAnyAuthority('ADMIN', 'AGENT')"
+                   class="dropdown-item"
+                   th:href="@{/showCreate}">
+                    Add a book
+                </a>
             </div>
         </li>
     </ul>
 
     <ul class="navbar-nav ml-auto">
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                <span sec:authentication="name">Guest</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right">
-                <a sec:authorize="!isAuthenticated()"
-                   class="dropdown-item"
-                   th:href="@{/login}">Login</a>
-
-                <a sec:authorize="isAuthenticated()"
-                   class="dropdown-item"
-                   th:href="@{/logout}">Logout</a>
-
-                <a class="dropdown-item" href="#">Profile</a>
-            </div>
+        <li class="nav-item mr-3 text-white align-self-center" sec:authorize="isAuthenticated()">
+            Signed in as <strong class="ml-1" sec:authentication="name"></strong>
+        </li>
+        <li class="nav-item mr-3 text-white align-self-center" sec:authorize="hasAuthority('ADMIN')">
+            Role: Admin
+        </li>
+        <li class="nav-item mr-3 text-white align-self-center" sec:authorize="hasAuthority('AGENT')">
+            Role: Agent
+        </li>
+        <li class="nav-item mr-3 text-white align-self-center" sec:authorize="!isAuthenticated()">
+            Guest mode
+        </li>
+        <li class="nav-item" sec:authorize="!isAuthenticated()">
+            <a class="nav-link" th:href="@{/login}">Login</a>
+        </li>
+        <li class="nav-item" sec:authorize="isAuthenticated()">
+            <a class="nav-link" th:href="@{/logout}">Logout</a>
         </li>
     </ul>
 </nav>

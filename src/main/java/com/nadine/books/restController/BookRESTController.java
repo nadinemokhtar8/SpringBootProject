@@ -1,6 +1,7 @@
 package com.nadine.books.restController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nadine.books.dto.BookDTO;
-import com.nadine.books.genres.Book;
 import com.nadine.books.service.BookService;
 
 @RestController
@@ -28,7 +28,7 @@ public class BookRESTController {
 	
 	@RequestMapping(value="/{id}",method = RequestMethod.GET)
 	public BookDTO getProduitById(@PathVariable("id") Long id) {	
-		return bookService.getProduit(id);
+		return bookService.getBook(id);
     }
 	
 	@RequestMapping(method = RequestMethod.POST)
@@ -48,11 +48,13 @@ public class BookRESTController {
 	}
 	
 	@RequestMapping(value="/prodscat/{idCat}",method = RequestMethod.GET)
-	public List<Book> getProduitsByCatId(@PathVariable("idG") Long idG) {
-		return bookService.findByGenreIdG(idG);
+	public List<BookDTO> getProduitsByCatId(@PathVariable("idCat") Long idCat) {
+		return bookService.findByGenreIdG(idCat).stream()
+				.map(bookService::convertEntityToDto)
+				.collect(Collectors.toList());
 	 }
 
 
 	
 	
-;}
+}

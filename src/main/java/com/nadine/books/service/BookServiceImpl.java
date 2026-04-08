@@ -141,12 +141,31 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDTO convertEntityToDto(Book book) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
-        return modelMapper.map(book, BookDTO.class);
+        BookDTO bookDto = new BookDTO();
+        bookDto.setIdProduit(book.getIdBook());
+        bookDto.setNomProduit(book.getBookName());
+        bookDto.setPrixProduit(book.getBookPrice());
+        bookDto.setDateCreation(book.getDateCreation());
+        if (book.getGenre() != null) {
+            bookDto.setNomCat(book.getGenre().getNameG());
+            bookDto.setGenre(book.getGenre());
+        }
+        return bookDto;
     }
 
     @Override
     public Book convertDtoToEntity(BookDTO bookDto) {
-        return modelMapper.map(bookDto, Book.class);
+        Book book = new Book();
+        book.setIdBook(bookDto.getIdProduit());
+        book.setBookName(bookDto.getNomProduit());
+        book.setBookPrice(bookDto.getPrixProduit());
+        book.setDateCreation(bookDto.getDateCreation());
+        if (bookDto.getGenre() != null && bookDto.getGenre().getIdG() != null) {
+            Genre genre = genreRepository.findById(bookDto.getGenre().getIdG()).orElse(null);
+            book.setGenre(genre);
+        } else {
+            book.setGenre(null);
+        }
+        return book;
     }
 }

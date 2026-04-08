@@ -1,21 +1,36 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
-	  xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="utf-8">
     <title>Book List</title>
     <link rel="stylesheet" type="text/css"
-          href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+          th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}" />
 </head>
 <body>
     <div th:replace="template"></div>
     <div class="container mt-5">
         <div class="card">
-            <div class="card-header">
-                Book List
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Book List</span>
+                <a sec:authorize="hasAnyAuthority('ADMIN', 'AGENT')"
+                   class="btn btn-primary btn-sm"
+                   th:href="@{/showCreate}">
+                    Add book
+                </a>
             </div>
             <div class="card-body">
+                <div class="alert alert-info" sec:authorize="!isAuthenticated()">
+                    You are browsing as a guest. Login as an agent or admin to create or manage books.
+                </div>
+                <div class="alert alert-secondary" sec:authorize="hasAuthority('AGENT')">
+                    Agent access: you can add and edit books.
+                </div>
+                <div class="alert alert-warning" sec:authorize="hasAuthority('ADMIN')">
+                    Admin access: you can add, edit, and delete books.
+                </div>
+
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -24,7 +39,7 @@
                             <th>Price</th>
                             <th>Creation Date</th>
                             <th>Genre</th>
-                 
+                            <th sec:authorize="hasAnyAuthority('ADMIN', 'AGENT')">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,30 +48,27 @@
                             <td th:text="${p.BookName}"></td>
                             <td th:text="${p.BookPrice}"></td>
                             <td th:text="${#dates.format(p.dateCreation,'yyyy-MM-dd')}"></td>
-                            <!-- Genre affiché ou 'Pas de Genre' -->
-                            <td th:text="${p.genre != null ? p.genre.NameG : 'Pas de Genre'}"></td>
-							<td sec:authorize="hasAuthority('ADMIN')">
-							    <a class="btn btn-danger"
-							       onclick="return confirm('Êtes-vous sûr ?')"
-							       th:href="@{/supprimerProduit(id=${p.idBook}, page=${currentPage}, size=${size})}">
-							        Supprimer
-							    </a>
-							</td>
-
-							<td sec:authorize="hasAuthority('ADMIN')">
-							    <a class="btn btn-success"
-							       th:href="@{/modifierLivre(id=${p.idBook}, page=${currentPage}, size=${size})}">
-							        Editer
-							    </a>
-							</td>
+                            <td th:text="${p.genre != null ? p.genre.NameG : 'No genre'}"></td>
+                            <td sec:authorize="hasAnyAuthority('ADMIN', 'AGENT')">
+                                <a class="btn btn-success btn-sm mr-2"
+                                   th:href="@{/modifierLivre(id=${p.idBook}, page=${currentPage}, size=${size})}">
+                                    Edit
+                                </a>
+                                <a sec:authorize="hasAuthority('ADMIN')"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Are you sure?')"
+                                   th:href="@{/supprimerProduit(id=${p.idBook}, page=${currentPage}, size=${size})}">
+                                    Delete
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
                 <ul class="nav nav-pills">
-                    <li th:each="page,status : ${pages}">
-                        <a th:class="${status.index==currentPage ? 'btn btn-primary' : 'btn'}"
-                           th:href="@{BookList(page=${status.index}, size=${size})}"
-                           th:text="${status.index}">
+                    <li th:each="page,status : ${pages}" class="mr-1">
+                        <a th:class="${status.index==currentPage ? 'btn btn-primary' : 'btn btn-outline-primary'}"
+                           th:href="@{/BookList(page=${status.index}, size=${size})}"
+                           th:text="${status.index + 1}">
                         </a>
                     </li>
                 </ul>

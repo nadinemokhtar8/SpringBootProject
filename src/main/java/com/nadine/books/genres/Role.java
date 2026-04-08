@@ -12,8 +12,6 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long role_id;
     private String role;
-
-    // Constructors
     public Role() {}
 
     public Role(Long role_id, String role) {
